@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recimotech AI Assistant (V1.4)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .chat-window { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hidden-chat { opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center text-white">
+    
+    <div class="text-center p-6">
+        <h1 class="text-4xl font-extrabold text-blue-500 mb-2">Recimotech AI Portal</h1>
+        <p class="text-gray-400">Click the chat bubble to interact with our Layered-Context AI model (V1.4)</p>
+    </div>
+
+    <button onclick="toggleChat()" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl transition duration-300 transform hover:scale-110 z-50">
+        <i id="toggle-icon" class="fas fa-comments text-2xl"></i>
+    </button>
+
+    <div id="chat-window" class="chat-window hidden-chat fixed bottom-24 right-6 w-96 h-[500px] bg-gray-800 rounded-2xl shadow-2xl flex flex-col border border-gray-700 overflow-hidden z-50">
+        <div class="bg-blue-600 p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
+                <div>
+                    <h3 class="font-bold text-white text-sm">Recimotech Support AI</h3>
+                    <p class="text-xs text-blue-200">Online | Select specific options below</p>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm flex flex-col">
+            <div class="bg-gray-700 text-gray-100 max-w-[85%] p-3 rounded-2xl rounded-tl-none self-start shadow-md animate-fade-in">
+                Hi! 👋 Welcome to Recimotech Solutions. I can help guide you through our specific operations. Choose a pathway below or type your question anytime!
+            </div>
+        </div>
+
+        <div class="p-3 bg-gray-850 border-t border-gray-700 flex items-center space-x-2">
+            <input type="text" id="user-input" onkeypress="handleKeyPress(event)" placeholder="Type your message here..." class="flex-1 bg-gray-700 text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-400">
+            <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl transition duration-200">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Track unique active session ID to pass history context smoothly to backend
+        let activeSessionId = null;
+        let currentMenuPath = null; 
+
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            const toggleIcon = document.getElementById('toggle-icon');
+            
+            if(chatWindow.classList.contains('hidden-chat')) {
+                chatWindow.classList.remove('hidden-chat');
+                toggleIcon.classList.remove('fa-comments');
+                toggleIcon.classList.add('fa-chevron-down');
+                
+                const chatBox = document.getElementById('chat-box');
+                if (chatBox.children.length <= 1) { 
+                    renderMenuPath('main');
+                }
+            } else {
+                chatWindow.classList.add('hidden-chat');
+                toggleIcon.classList.remove('fa-chevron-down');
+                toggleIcon.classList.add('fa-comments');
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+
+        // --- LAYERED MENU RENDERER ---
+        function renderMenuPath(path, label = '') {
+            removeCurrentOptions();
+            const chatBox = document.getElementById('chat-box');
+            currentMenuPath = path;
+
+            const menuWrapper = document.createElement('div');
+            menuWrapper.className = "flex flex-col space-y-2 pt-3 max-w-[85%] self-start w-full animate-fade-in";
+            menuWrapper.id = "active-options-wrapper";
+
+            let menuHTML = '';
+
+            if (path === 'main') {
+                menuHTML = `
+                    <p class="text-xs text-gray-400 font-semibold mb-1">Select an Operational Track:</p>
+                    <button onclick="renderMenuPath('mern', 'Professional IT Training')" class="w-full bg-gray-700 hover:bg-blue-600 border border-gray-600 text-white py-2.5 px-4 rounded-xl text-left transition flex items-center justify-between group">
+                        <span>📚 IT Training Batches</span>
+                        <i class="fas fa-chevron-right text-xs text-gray-500 group-hover:text-white"></i>
+                    </button>
+                    <button onclick="renderMenuPath('services', 'Enterprise Software Services')" class="w-full bg-gray-700 hover:bg-blue-600 border border-gray-600 text-white py-2.5 px-4 rounded-xl text-left transition flex items-center justify-between group">
+                        <span>💻 Software Development</span>
+                        <i class="fas fa-chevron-right text-xs text-gray-500 group-hover:text-white"></i>
+                    </button>
+                `;
+            } else if (path === 'mern') {
+                menuHTML = `
+                    <p class="text-xs text-blue-400 font-semibold mb-1">Select a specific course track:</p>
+                    <button onclick="handleOptionClick('Tell me details about MERN Stack Development course', 'ml')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3.5 rounded-lg text-xs font-medium">🚀 MERN Stack Development</button>
+                    <button onclick="handleOptionClick('Tell me details about Machine Learning and AI course', 'ml')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3.5 rounded-lg text-xs font-medium">🧠 Machine Learning & AI</button>
+                    <button onclick="handleOptionClick('Tell me details about Full-Stack Web Development course', 'ml')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3.5 rounded-lg text-xs font-medium">🌐 Full-Stack Web Dev</button>
+                    <button onclick="handleOptionClick('Do you offer internship programs for students', 'ml')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3.5 rounded-lg text-xs font-medium">💼 Structured Internships</button>
+                `;
+            } else if (path === 'ml') {
+                menuHTML = `
+                    <p class="text-xs text-blue-400 font-semibold mb-1">Granular FAQs for that topic:</p>
+                    <button onclick="handleOptionClick('How many months is the course and what is the duration')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3 rounded-lg text-xs">• Duration & Full Schedule?</button>
+                    <button onclick="handleOptionClick('How many projects will I do and what are they')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3 rounded-lg text-xs">• Project Portfolio Details?</button>
+                    <button onclick="handleOptionClick('What is the complete syllabus for that course track')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3 rounded-lg text-xs">• Full Syllabus Breakdown?</button>
+                    <button onclick="handleOptionClick('I want to enroll in that project right now')" class="w-full bg-blue-700 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-xs font-semibold">• Enquire / Enroll Now!</button>
+                `;
+            } else if (path === 'services') {
+                menuHTML = `
+                    <p class="text-xs text-green-400 font-semibold mb-1">Operational Capabilities:</p>
+                    <button onclick="handleOptionClick('Tell me about your enterprise software development capabilities')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3 rounded-lg text-xs text-left">• Development Services Overview?</button>
+                    <button onclick="handleOptionClick('What kind of live projects do you build')" class="w-full bg-gray-750 hover:bg-blue-600 border border-gray-700 text-white py-2 px-3 rounded-lg text-xs text-left">• Live Project Portfolio?</button>
+                    <button onclick="handleOptionClick('How can I contact Recimotech request a project quote')" class="w-full bg-green-700 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-xs font-semibold">• Request Project Quote!</button>
+                `;
+            }
+
+            if (path !== 'main' && path !== 'mern' && path !== 'services') {
+                 menuHTML += `
+                    <button onclick="renderMenuPath('mern')" class="w-full bg-transparent border border-dashed border-gray-600 text-gray-400 py-1.5 px-3 rounded-lg text-center text-xs hover:text-white hover:border-white transition mt-2">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Courses
+                    </button>
+                `;
+            } else if (path === 'mern' || path === 'services') {
+                menuHTML += `
+                    <button onclick="renderMenuPath('main')" class="w-full bg-transparent border border-dashed border-gray-600 text-gray-400 py-1.5 px-3 rounded-lg text-center text-xs hover:text-white hover:border-white transition mt-2">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Tracks
+                    </button>
+                `;
+            }
+
+            menuWrapper.innerHTML = menuHTML;
+            chatBox.appendChild(menuWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function removeCurrentOptions() {
+            const currentWrapper = document.getElementById('active-options-wrapper');
+            if (currentWrapper) currentWrapper.remove();
+        }
+
+        function handleOptionClick(textValue, nextPath = null) {
+            removeCurrentOptions();
+            document.getElementById('user-input').value = textValue;
+            sendMessage(nextPath);
+        }
+
+        // --- SINGLE UNIFIED SEND MESSAGE ENGINE ---
+        async function sendMessage(nextFaqPath = null) {
+            const inputField = document.getElementById('user-input');
+            const messageText = inputField.value.trim();
+            if (!messageText) return;
+
+            const chatBox = document.getElementById('chat-box');
+            removeCurrentOptions(); 
+
+            // 1. Render User Message Bubble
+            const userBubble = document.createElement('div');
+            userBubble.className = "bg-blue-600 text-white max-w-[85%] p-3 rounded-2xl rounded-tr-none self-end shadow-md font-medium text-right";
+            userBubble.innerText = messageText;
+            chatBox.appendChild(userBubble);
+            
+            inputField.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // 2. Render Thinking Status Indicator
+            const typingBubble = document.createElement('div');
+            typingBubble.className = "bg-gray-700 text-gray-400 max-w-[40%] p-3 rounded-2xl rounded-tl-none self-start italic animate-pulse";
+            typingBubble.id = "typing-loader";
+            typingBubble.innerText = "Thinking...";
+            chatBox.appendChild(typingBubble);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                // 3. POST data to local main.py RAG endpoint
+                const response = await fetch('http://127.0.0.1:8000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: messageText,
+                        session_id: activeSessionId 
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('typing-loader').remove();
+
+                // Save active session token from background response context
+                activeSessionId = data.session_id;
+
+                // 4. Render RAG LLM Custom Content text
+                const botBubble = document.createElement('div');
+                botBubble.className = "bg-gray-700 text-gray-100 max-w-[85%] p-3 rounded-2xl rounded-tl-none self-start shadow-md line-height-relaxed markdown-content";
+                botBubble.innerHTML = data.response.replace(/\n/g, '<br>'); 
+                chatBox.appendChild(botBubble);
+
+                // 5. Dynamic Adaptive UI Navigation Routing 
+                if (!data.isContactRequested) {
+                    if (nextFaqPath) {
+                        renderMenuPath(nextFaqPath);
+                    } else if (currentMenuPath === 'mern' || currentMenuPath === 'services') {
+                        renderMenuPath(currentMenuPath);
+                    } else {
+                        renderMenuPath('main');
+                    }
+                } else {
+                    const subtleHint = document.createElement('p');
+                    subtleHint.className = "text-center text-xs text-gray-600 py-3 italic w-full";
+                    subtleHint.innerText = "Please provide your contact profile details above.";
+                    chatBox.appendChild(subtleHint);
+                }
+
+            } catch (error) {
+                if(document.getElementById('typing-loader')) {
+                    document.getElementById('typing-loader').remove();
+                }
+                const errorBubble = document.createElement('div');
+                errorBubble.className = "bg-red-900/50 text-red-200 border border-red-700 max-w-[85%] p-3 rounded-2xl self-start text-xs";
+                errorBubble.innerText = "RAG Agent communication broken. Verify that main.py terminal engine is executing.";
+                chatBox.appendChild(errorBubble);
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
