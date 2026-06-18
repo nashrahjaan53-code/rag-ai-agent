@@ -8,7 +8,7 @@ An advanced, conversational Retrieval-Augmented Generation (RAG) AI Agent engine
 * **Dynamic File Ingestion:** Completely separates data from code logic by loading and embedding text assets directly from `company_knowledge.txt` on server startup.
 * **Intent-Driven Lead Routing:** Out-of-the-box system rules designed to flag transactional intent and collect user profile data seamlessly.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 * **Backend:** Python, FastAPI, Uvicorn
 * **AI & Embeddings:** `google-genai` SDK, `sentence-transformers` (`all-MiniLM-L6-v2`), Scikit-Learn (Cosine Similarity)
 * **Frontend:** HTML5, Tailwind CSS, Native JavaScript ES6+
