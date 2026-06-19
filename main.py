@@ -6,6 +6,7 @@ import uuid
 import traceback  # Prints exact error tracebacks if an internal crash happens
 from typing import Optional  # Stops FastAPI from throwing 422 validation errors on null payloads
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
@@ -17,6 +18,10 @@ from google import genai
 from google.genai import types
 
 app = FastAPI(title="Recimotech Enterprise File-RAG Agent")
+
+@app.get("/")
+async def serve_frontend():
+    return FileResponse("index.html")
 
 # Enable CORS for seamless connection with index.html
 app.add_middleware(
