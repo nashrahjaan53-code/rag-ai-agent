@@ -18,5 +18,5 @@ COPY . .
 # Expose Hugging Face Space port
 EXPOSE 7860
 
-# Run uvicorn server on port 7860
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
+# Run uvicorn server with dynamic port fallback for Hugging Face (7860) and Railway ($PORT)
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}"]
