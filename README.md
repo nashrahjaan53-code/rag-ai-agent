@@ -1,12 +1,4 @@
----
-title: Recimotech Enterprise RAG AI Agent
-emoji: 🚀
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 7860
-pinned: false
----
+
 
 # Recimotech Enterprise RAG AI Agent
 
