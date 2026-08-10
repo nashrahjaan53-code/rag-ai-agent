@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import uvicorn
 
@@ -49,10 +49,10 @@ else:
         KNOWLEDGE_BASE = chunks
     print(f"[SUCCESS] Ingested {len(KNOWLEDGE_BASE)} detailed structural context blocks!")
 
-# Initialize NLP Model for Semantic Search Embeddings
-print("[INFO] Embedding parsed company details...")
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
-KB_EMBEDDINGS = embedding_model.encode(KNOWLEDGE_BASE)
+# Initialize Lightweight Vectorizer for Semantic Search RAG (<15MB RAM)
+print("[INFO] Vectorizing parsed company details for lightweight RAG...")
+vectorizer = TfidfVectorizer().fit(KNOWLEDGE_BASE)
+KB_VECTORS = vectorizer.transform(KNOWLEDGE_BASE)
 
 # Verify API Key exists before starting client to prevent hidden crashes
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -97,11 +97,11 @@ async def chat_endpoint(payload: ChatRequest):
     
     try:
         # ---- STEP A: RAG SEARCH ----
-        query_embedding = embedding_model.encode([user_query])
-        similarities = cosine_similarity(query_embedding, KB_EMBEDDINGS)[0]
+        query_vector = vectorizer.transform([user_query])
+        similarities = cosine_similarity(query_vector, KB_VECTORS)[0]
         
         top_indices = np.argsort(similarities)[-3:][::-1]
-        retrieved_context = "\n\n".join([KNOWLEDGE_BASE[idx] for idx in top_indices if similarities[idx] > 0.15])
+        retrieved_context = "\n\n".join([KNOWLEDGE_BASE[idx] for idx in top_indices if similarities[idx] > 0.01])
         
         # ---- STEP B: COMPILE RECENT CONVERSATION HISTORY TIMELINE ----
         formatted_history = ""
@@ -128,7 +128,7 @@ async def chat_endpoint(payload: ChatRequest):
 
         # ---- STEP D: GENERATE RESPONSE VIA LLM ----
         client = get_ai_client()
-        candidate_models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash-latest']
+        candidate_models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-flash-latest']
         bot_response = None
         last_error = None
 
