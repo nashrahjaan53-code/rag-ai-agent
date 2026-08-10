@@ -251,21 +251,6 @@ Its modular architecture makes it adaptable for customer support, internal knowl
 
 ---
 
-# 👩‍💻 Author
-
-**Nashrah Khan**
-
-BCA Student • Full Stack Developer • AI Enthusiast
-
-Interested in:
-
-- Artificial Intelligence
-- Retrieval-Augmented Generation (RAG)
-- Large Language Models
-- Backend Development
-- Enterprise AI Systems
-
----
 
 <div align="center">
 
