@@ -128,7 +128,7 @@ async def chat_endpoint(payload: ChatRequest):
 
         # ---- STEP D: GENERATE RESPONSE VIA LLM ----
         client = get_ai_client()
-        candidate_models = ['gemini-2.0-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-2.5-flash']
+        candidate_models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash-latest']
         bot_response = None
         last_error = None
 
