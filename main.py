@@ -128,25 +128,28 @@ async def chat_endpoint(payload: ChatRequest):
 
         # ---- STEP D: GENERATE RESPONSE VIA LLM ----
         client = get_ai_client()
-        try:
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',  
-                contents=user_query,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=0.35,
-                ),
-            )
-        except Exception:
-            response = client.models.generate_content(
-                model='gemini-2.0-flash',  
-                contents=user_query,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=0.35,
-                ),
-            )
-        bot_response = response.text.strip()
+        candidate_models = ['gemini-2.0-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-2.5-flash']
+        bot_response = None
+        last_error = None
+
+        for model_name in candidate_models:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,  
+                    contents=user_query,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        temperature=0.35,
+                    ),
+                )
+                bot_response = response.text.strip()
+                break
+            except Exception as err:
+                last_error = err
+                continue
+
+        if not bot_response:
+            raise HTTPException(status_code=500, detail=f"LLM Generation failed across models: {str(last_error)}")
         
         # ---- STEP E: SAVE CURRENT EXCHANGE TO MEMORY ----
         chat_history.append({"role": "user", "content": user_query})
