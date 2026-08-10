@@ -20,7 +20,7 @@
 
 Modern organizations generate vast amounts of unstructured information spread across documents, manuals, FAQs, policies, and internal knowledge bases. Traditional chatbots relying on predefined responses often struggle to provide accurate, context-aware answers.
 
-The **Recimotech Enterprise RAG AI Agent** leverages Retrieval-Augmented Generation (RAG) to retrieve relevant organizational knowledge and synthesize responses using Google's **Gemini 2.5 Flash** Large Language Model.
+The **Recimotech Enterprise RAG AI Agent** leverages Retrieval-Augmented Generation (RAG) to retrieve relevant organizational knowledge and synthesize responses using Google's **Gemini 2.0 Flash** Large Language Model.
 
 The system combines semantic search, conversational memory, and intelligent retrieval to create a scalable enterprise AI assistant capable of supporting employees and customers through natural, multi-turn conversations.
 
@@ -101,7 +101,7 @@ A[User Query]
 B[FastAPI Backend]
 C[Embedding Search]
 D[Knowledge Base]
-E[Gemini 2.5 Flash]
+E[Gemini 2.0 Flash]
 F[Generated Response]
 
 A --> B
@@ -152,7 +152,7 @@ Built using FastAPI with a modular architecture suitable for production-ready de
 | Backend | Python |
 | API Framework | FastAPI |
 | Server | Uvicorn |
-| LLM | Gemini 2.5 Flash |
+| LLM | Gemini 2.0 Flash |
 | Embeddings | Sentence Transformers |
 | Similarity Search | Scikit-Learn |
 | Environment | Python Dotenv |
@@ -188,7 +188,7 @@ Recimotech-RAG-Agent
 | Metric | Value |
 |----------|--------|
 | Architecture | Retrieval-Augmented Generation |
-| LLM | Gemini 2.5 Flash |
+| LLM | Gemini 2.0 Flash |
 | API Framework | FastAPI |
 | Vector Search | Sentence Transformers |
 | Session Memory | Included |

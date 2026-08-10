@@ -1,1 +1,11 @@
-Recimotech Solutions is an elite IT company in Karan Nagar, Srinagar.
+Recimotech Solutions is an elite IT company and software development agency located in Karan Nagar, Srinagar, Jammu & Kashmir. We specialize in enterprise software engineering, custom web & mobile application development, AI & RAG integrations, and industry-grade IT training programs. Contact us at info@recimotech.com or visit our main hub in Karan Nagar, Srinagar.
+
+Our Professional MERN Stack Development course is a 3-month intensive training program. The syllabus covers HTML5, CSS3, JavaScript (ES6+), React.js, Node.js, Express.js, MongoDB, REST API design, and Git/GitHub version control. Students work on 3+ live industry projects including an E-commerce store, Real-time Chat application, and a Full-Stack Admin Dashboard. Flexible morning and evening batch timings are available with hands-on lab sessions and affordable fee installment plans.
+
+Our Machine Learning & AI course is a 3-month specialized track covering Python programming, Data Science libraries (Pandas, NumPy, Matplotlib), Scikit-Learn algorithms, Deep Learning fundamentals with PyTorch, Large Language Models (LLMs), Prompt Engineering, and Retrieval-Augmented Generation (RAG) agent architecture. Students build live AI models such as predictive analytics engines, automated RAG support agents, and NLP classifier models.
+
+Our Full-Stack Web Development course spans 3 months, teaching end-to-end web application architecture from frontend UI design (Tailwind CSS, JavaScript) to backend server development, database modeling, authentication, security, and cloud deployment on platforms like Vercel, Render, and AWS.
+
+Recimotech Solutions offers structured 3-month and 6-month internship programs for BCA, B.Tech, MCA, BSc IT students, and fresh graduates. Interns work directly on live client software projects, receive daily mentorship from senior software engineers, participate in code reviews, and earn a verified Certificate of Completion, Letter of Recommendation (LOR), and placement assistance.
+
+Our Enterprise Software Development Services include custom web application development, mobile app development (iOS and Android), enterprise AI chatbot & RAG pipeline integration, cloud architecture, and UI/UX design. Clients can request a commercial project quote or schedule a technical consultation by getting in touch with our team at our Srinagar office or submitting a contact request.

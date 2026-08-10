@@ -37,30 +37,37 @@ KNOWLEDGE_FILE = "company_knowledge.txt"
 KNOWLEDGE_BASE = []
 
 if not os.path.exists(KNOWLEDGE_FILE):
-    print(f"⚠️ Warning: {KNOWLEDGE_FILE} not found! Creating a placeholder file.")
+    print(f"[WARNING] {KNOWLEDGE_FILE} not found! Creating a placeholder file.")
     KNOWLEDGE_BASE = ["Recimotech Solutions is an elite IT company in Karan Nagar, Srinagar."]
     with open(KNOWLEDGE_FILE, "w", encoding="utf-8") as f:
         f.write(KNOWLEDGE_BASE[0])
 else:
-    print(f"📖 Loading complete company details from {KNOWLEDGE_FILE}...")
+    print(f"[INFO] Loading complete company details from {KNOWLEDGE_FILE}...")
     with open(KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
         raw_text = f.read()
         chunks = [chunk.strip() for chunk in raw_text.split("\n\n") if chunk.strip()]
         KNOWLEDGE_BASE = chunks
-    print(f"✅ Successfully ingested {len(KNOWLEDGE_BASE)} detailed structural context blocks!")
+    print(f"[SUCCESS] Ingested {len(KNOWLEDGE_BASE)} detailed structural context blocks!")
 
 # Initialize NLP Model for Semantic Search Embeddings
-print("🧠 Embedding parsed company details...")
+print("[INFO] Embedding parsed company details...")
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 KB_EMBEDDINGS = embedding_model.encode(KNOWLEDGE_BASE)
 
 # Verify API Key exists before starting client to prevent hidden crashes
-if not os.environ.get("GEMINI_API_KEY"):
-    print("\n❌ CRITICAL ERROR: GEMINI_API_KEY is completely missing from your environment variables or .env file!")
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    print("\n[WARNING] GEMINI_API_KEY is missing from environment variables or .env file!")
     print("Please ensure your .env file has: GEMINI_API_KEY=your_key_here\n")
 
-# Initialize your LLM client
-ai_client = genai.Client()
+def get_ai_client():
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        raise HTTPException(
+            status_code=500,
+            detail="GEMINI_API_KEY is missing. Please configure GEMINI_API_KEY in your .env file."
+        )
+    return genai.Client()
 
 # Stateful Session Memory Store
 SESSION_STORAGE = {}
@@ -94,7 +101,7 @@ async def chat_endpoint(payload: ChatRequest):
         similarities = cosine_similarity(query_embedding, KB_EMBEDDINGS)[0]
         
         top_indices = np.argsort(similarities)[-3:][::-1]
-        retrieved_context = "\n\n".join([KNOWLEDGE_BASE[idx] for idx in top_indices if similarities[idx] > 0.22])
+        retrieved_context = "\n\n".join([KNOWLEDGE_BASE[idx] for idx in top_indices if similarities[idx] > 0.15])
         
         # ---- STEP B: COMPILE RECENT CONVERSATION HISTORY TIMELINE ----
         formatted_history = ""
@@ -120,9 +127,9 @@ async def chat_endpoint(payload: ChatRequest):
         """
 
         # ---- STEP D: GENERATE RESPONSE VIA LLM ----
-        # FIXED: Updated model routing variable path to gemini-2.5-flash to eliminate SDK 404 faults
-        response = ai_client.models.generate_content(
-            model='gemini-2.5-flash',  
+        client = get_ai_client()
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',  
             contents=user_query,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
@@ -135,8 +142,8 @@ async def chat_endpoint(payload: ChatRequest):
         chat_history.append({"role": "user", "content": user_query})
         chat_history.append({"role": "model", "content": bot_response})
         
-        trigger_words = ["name", "phone", "number", "email", "contact details", "details"]
-        is_contact_requested = any(word in bot_response.lower() for word in trigger_words)
+        trigger_phrases = ["your name", "your email", "phone number", "contact details", "provide your contact", "share your phone"]
+        is_contact_requested = any(phrase in bot_response.lower() for phrase in trigger_phrases)
 
         return {
             "response": bot_response, 
@@ -146,7 +153,7 @@ async def chat_endpoint(payload: ChatRequest):
         
     except Exception as e:
         # Added tracking to show you EXACTLY what broke in the terminal console window
-        print("\n❌ BACKEND CRASH ERROR LOG:")
+        print("\n[ERROR] BACKEND CRASH ERROR LOG:")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
