@@ -128,14 +128,24 @@ async def chat_endpoint(payload: ChatRequest):
 
         # ---- STEP D: GENERATE RESPONSE VIA LLM ----
         client = get_ai_client()
-        response = client.models.generate_content(
-            model='gemini-1.5-flash',  
-            contents=user_query,
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=0.35,
-            ),
-        )
+        try:
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',  
+                contents=user_query,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.35,
+                ),
+            )
+        except Exception:
+            response = client.models.generate_content(
+                model='gemini-2.0-flash',  
+                contents=user_query,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.35,
+                ),
+            )
         bot_response = response.text.strip()
         
         # ---- STEP E: SAVE CURRENT EXCHANGE TO MEMORY ----
